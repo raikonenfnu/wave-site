@@ -103,11 +103,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Apply syntax highlighting to all code blocks
-    const codeBlocks = document.querySelectorAll('pre code, .code-content code');
-    codeBlocks.forEach(codeElement => {
-        highlightCode(codeElement);
-    });
 
     // Add scroll effect to navbar
     window.addEventListener('scroll', function() {

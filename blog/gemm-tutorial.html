@@ -133,13 +133,11 @@
         }
 
         .blog-post-content code {
-            background: var(--surface-color);
+            /* background: var(--surface-color); */
             padding: 0.25rem 0.5rem;
             border-radius: 0.25rem;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             font-size: 0.875rem;
-            color: var(--primary-color);
-            border: 1px solid var(--border-color);
         }
 
         .blog-nav {
@@ -243,8 +241,9 @@
                         <button class="blog-code-copy" onclick="copyBlogCode(this)">Copy</button>
                     </div>
                     <div class="blog-code-content">
-<pre><code>import tkw_kernel_lang as tkl
-import tkw_lang as tkw
+<pre><code>
+import wave_lang.kernel.lang as tkl
+import wave_lang.kernel.wave as tkw
 import torch
 
 # Define symbolic dimensions
@@ -304,8 +303,8 @@ ADDRESS_SPACE = tkl.sym.ADDRESS_SPACE</code></pre>
                         <button class="blog-code-copy" onclick="copyBlogCode(this)">Copy</button>
                     </div>
                     <div class="blog-code-content">
-<pre><code>@tkw.wave(constraints)
-@tkw.iterate(K, init_args=[acc])
+<pre><code>
+@tkw.wave(constraints)
 def gemm_kernel(
     a: tkl.Memory[M, K, ADDRESS_SPACE, tkl.f16],
     b: tkl.Memory[N, K, ADDRESS_SPACE, tkl.f16],
@@ -395,15 +394,6 @@ assert torch.allclose(C, expected, atol=1e-3)</code></pre>
                     instructions, which can achieve peak theoretical performance on modern GPUs.
                 </p>
 
-                <div class="highlight">
-                    <h4>Performance Benefits</h4>
-                    <p>This Wave Lang GEMM kernel typically achieves:</p>
-                    <ul>
-                        <li><strong>90%+</strong> of theoretical peak FLOPS on modern GPUs</li>
-                        <li><strong>2x</strong> memory bandwidth efficiency vs naive implementations</li>
-                        <li><strong>Automatic tuning</strong> for different matrix sizes and GPU architectures</li>
-                    </ul>
-                </div>
 
                 <h2>Advanced Features</h2>
 
@@ -411,34 +401,6 @@ assert torch.allclose(C, expected, atol=1e-3)</code></pre>
                 <p>
                     You can easily modify the kernel for different precision combinations by changing the type annotations:
                 </p>
-
-                <div class="blog-code-block">
-                    <div class="blog-code-header">
-                        <span class="blog-code-language">Python</span>
-                        <button class="blog-code-copy" onclick="copyBlogCode(this)">Copy</button>
-                    </div>
-                    <div class="blog-code-content">
-<pre><code># Full precision version
-def gemm_fp32(
-    a: tkl.Memory[M, K, ADDRESS_SPACE, tkl.f32],
-    b: tkl.Memory[N, K, ADDRESS_SPACE, tkl.f32],
-    c: tkl.Memory[M, N, ADDRESS_SPACE_0, tkl.f32],
-    acc: tkl.Register[M, N, tkl.f32],
-):
-    # Same kernel logic, different precision
-    pass
-
-# Integer version for quantized models
-def gemm_int8(
-    a: tkl.Memory[M, K, ADDRESS_SPACE, tkl.i8],
-    b: tkl.Memory[N, K, ADDRESS_SPACE, tkl.i8],
-    c: tkl.Memory[M, N, ADDRESS_SPACE_0, tkl.i32],
-    acc: tkl.Register[M, N, tkl.i32],
-):
-    # Same kernel logic, integer arithmetic
-    pass</code></pre>
-                    </div>
-                </div>
 
                 <h3>Dynamic Shapes</h3>
                 <p>
@@ -507,15 +469,6 @@ def gemm_int8(
             });
         }
 
-        // Apply syntax highlighting when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            const codeBlocks = document.querySelectorAll('pre code');
-            codeBlocks.forEach(codeElement => {
-                if (typeof highlightCode === 'function') {
-                    highlightCode(codeElement);
-                }
-            });
-        });
     </script>
 </body>
 </html>
