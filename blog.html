@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Lang Blog - GPU Programming Made Simple</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .blog-hero {
+            padding: 8rem 0 4rem;
+            background: var(--hero-background);
+            text-align: center;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .blog-card {
+            background: var(--card-background);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .blog-card-image {
+            height: 200px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+        }
+
+        .blog-card-content {
+            padding: 1.5rem;
+        }
+
+        .blog-card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .blog-card-excerpt {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .blog-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-card-date {
+            color: var(--primary-color);
+        }
+
+        .blog-card-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .blog-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .blog-tag {
+            background: var(--surface-color);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>Wave Lang</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="compiler.html" class="nav-link">Compiler</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="https://github.com/iree-org/wave" class="nav-link" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="blog-hero">
+            <div class="container">
+                <h1 class="hero-title">
+                    Wave Lang <span class="gradient-text">Blog</span>
+                </h1>
+                <p class="hero-description">
+                    Tutorials, deep dives, and insights into GPU programming with Wave Lang.
+                    Learn from practical examples and expert techniques.
+                </p>
+            </div>
+        </section>
+
+        <section class="blog-posts">
+            <div class="container">
+                <div class="blog-grid">
+                    <a href="blog/gemm-tutorial.html" class="blog-card-link">
+                        <article class="blog-card">
+                            <div class="blog-card-image">
+                                🔢
+                            </div>
+                            <div class="blog-card-content">
+                                <h3 class="blog-card-title">GEMM Tutorial: High-Performance Matrix Multiplication</h3>
+                                <p class="blog-card-excerpt">
+                                    Learn how to implement a highly optimized matrix multiplication kernel using Wave Lang.
+                                    This comprehensive tutorial covers constraints, memory management, and performance optimization.
+                                </p>
+                                <div class="blog-card-meta">
+                                    <span class="blog-card-date">Latest Tutorial</span>
+                                    <span>15 min read</span>
+                                </div>
+                                <div class="blog-tags">
+                                    <span class="blog-tag">Tutorial</span>
+                                    <span class="blog-tag">GEMM</span>
+                                    <span class="blog-tag">Performance</span>
+                                    <span class="blog-tag">Linear Algebra</span>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+
+                    <!-- Placeholder for future blog posts -->
+                    <article class="blog-card" style="opacity: 0.7;">
+                        <div class="blog-card-image">
+                            ⚡
+                        </div>
+                        <div class="blog-card-content">
+                            <h3 class="blog-card-title">Optimizing Attention Mechanisms</h3>
+                            <p class="blog-card-excerpt">
+                                Deep dive into implementing memory-efficient attention kernels with Wave Lang.
+                                Learn about Flash Attention and custom masking patterns.
+                            </p>
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date">Coming Soon</span>
+                                <span>20 min read</span>
+                            </div>
+                            <div class="blog-tags">
+                                <span class="blog-tag">Tutorial</span>
+                                <span class="blog-tag">Attention</span>
+                                <span class="blog-tag">Memory</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" style="opacity: 0.7;">
+                        <div class="blog-card-image">
+                            🎛️
+                        </div>
+                        <div class="blog-card-content">
+                            <h3 class="blog-card-title">Understanding Wave Lang Constraints</h3>
+                            <p class="blog-card-excerpt">
+                                Master the art of constraint-based programming in Wave Lang. Learn how to express
+                                scheduling, tiling, and hardware optimizations declaratively.
+                            </p>
+                            <div class="blog-card-meta">
+                                <span class="blog-card-date">Coming Soon</span>
+                                <span>12 min read</span>
+                            </div>
+                            <div class="blog-tags">
+                                <span class="blog-tag">Guide</span>
+                                <span class="blog-tag">Constraints</span>
+                                <span class="blog-tag">Architecture</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://wave-lang.readthedocs.io/" target="_blank">Documentation</a>
+                    <a href="https://github.com/iree-org/wave" target="_blank">GitHub</a>
+                    <a href="https://github.com/iree-org/wave/issues" target="_blank">Issues</a>
+                </div>
+                <p>&copy; 2024 IREE Project. Open source under Apache 2.0.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Apply syntax highlighting when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('pre code');
+            codeBlocks.forEach(codeElement => {
+                if (typeof highlightCode === 'function') {
+                    highlightCode(codeElement);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

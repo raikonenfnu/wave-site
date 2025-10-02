@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Lang Examples - GPU Programming Made Simple</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .examples-hero {
+            padding: 8rem 0 4rem;
+            background: var(--hero-background);
+            text-align: center;
+        }
+
+        .examples-grid {
+            display: grid;
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .example-card {
+            background: var(--card-background);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .example-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .example-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .example-code {
+            background: #1e293b;
+        }
+
+        .code-tabs {
+            background: #334155;
+            display: flex;
+            border-bottom: 1px solid #475569;
+        }
+
+        .code-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .code-tab.active {
+            color: #e2e8f0;
+            background: #1e293b;
+        }
+
+        .code-tab:hover {
+            color: #e2e8f0;
+        }
+
+        .code-content {
+            padding: 1.5rem;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .code-block {
+            display: none;
+        }
+
+        .code-block.active {
+            display: block;
+        }
+
+        .copy-code-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: #475569;
+            color: #e2e8f0;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background-color 0.2s ease;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .example-code:hover .copy-code-btn {
+            opacity: 1;
+        }
+
+        .copy-code-btn:hover {
+            background: #64748b;
+        }
+
+        .example-code {
+            position: relative;
+        }
+
+        .performance-note {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            margin: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .performance-note strong {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>Wave Lang</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="compiler.html" class="nav-link">Compiler</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="https://github.com/iree-org/wave" class="nav-link" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="examples-hero">
+            <div class="container">
+                <h1 class="hero-title">
+                    Wave Lang <span class="gradient-text">Examples</span>
+                </h1>
+                <p class="hero-description">
+                    See how Wave Lang makes GPU programming simple with these practical examples.
+                    From basic operations to complex ML kernels.
+                </p>
+            </div>
+        </section>
+
+        <section class="examples">
+            <div class="container">
+                <div class="examples-grid">
+                    <!-- Vector Addition Example -->
+                    <div class="example-card">
+                        <div class="example-header">
+                            <h3 class="example-title">Vector Addition</h3>
+                            <p class="example-description">
+                                The classic "Hello World" of GPU programming. Add two vectors element-wise
+                                with automatic parallelization and memory optimization.
+                            </p>
+                        </div>
+                        <div class="example-code">
+                            <div class="code-tabs">
+                                <button class="code-tab active" onclick="showTab(this, 'vector-wave')">Wave</button>
+                                <button class="code-tab" onclick="showTab(this, 'vector-usage')">Usage</button>
+                            </div>
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <div class="code-content">
+                                <div class="code-block active" id="vector-wave">
+<pre><code>import wave_lang.kernel.lang as tkl as tkl
+import wave_lang.kernel.wave as tkw
+
+# Define symbolic dimensions
+M = tkl.sym.M
+N = tkl.sym.N
+
+@tkw.wave(constraints)
+def vector_add(
+    a: tkl.Memory[M, N, ADDRESS_SPACE, tkl.f16],
+    b: tkl.Memory[M, N, ADDRESS_SPACE, tkl.f16],
+    c: tkl.Memory[M, N, ADDRESS_SPACE, tkl.f16],
+):
+    """Add two vectors element-wise."""
+    lhs = tkw.read(a)
+    rhs = tkw.read(b)
+    res = lhs + rhs
+    tkw.write(res, c)</code></pre>
+                                </div>
+                                <div class="code-block" id="vector-usage">
+<pre><code>import torch
+
+# Define constraints for the kernel
+constraints = [
+    tkw.HardwareConstraint(vector_shapes={0: 4}),
+    tkw.WorkgroupConstraint(M=64, N=64, BLOCK_M=16, BLOCK_N=16)
+]
+
+# Compile to optimized GPU kernel
+kernel = tkw.compile(vector_add, constraints)
+
+# Create input tensors
+a = torch.randn(1024, 512, dtype=torch.float16, device='cuda')
+b = torch.randn(1024, 512, dtype=torch.float16, device='cuda')
+c = torch.zeros_like(a)
+
+# Execute the compiled kernel
+kernel(a, b, c)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Softmax Example -->
+                    <div class="example-card">
+                        <div class="example-header">
+                            <h3 class="example-title">Softmax Function</h3>
+                            <p class="example-description">
+                                A numerically stable softmax implementation with reduction operations.
+                                Demonstrates how Wave handles complex mathematical patterns.
+                            </p>
+                        </div>
+                        <div class="example-code">
+                            <div class="code-tabs">
+                                <button class="code-tab active" onclick="showTab(this, 'softmax-wave')">Wave</button>
+                                <button class="code-tab" onclick="showTab(this, 'softmax-usage')">Usage</button>
+                            </div>
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <div class="code-content">
+                                <div class="code-block active" id="softmax-wave">
+<pre><code class="python">import wave_lang.kernel.lang as tkl as tkl
+import wave_lang.kernel.wave as tkw
+
+# Define symbolic dimensions
+M = tkl.sym.M
+N = tkl.sym.N
+
+@tkw.wave(constraints)
+def softmax(
+    a: tkl.Memory[M, N, ADDRESS_SPACE, tkl.f32],
+    b: tkl.Memory[M, N, ADDRESS_SPACE, tkl.f32],
+):
+    """Numerically stable softmax across the last dimension."""
+    val = tkw.read(a)
+
+    # Find maximum for numerical stability
+    row_max = tkw.max(val, dim=N)
+    row_max_bcast = tkw.broadcast(row_max, [M, N])
+    val -= row_max_bcast
+
+    # Exponentiate
+    val = tkw.exp(val)
+
+    # Sum and normalize
+    denominator = tkw.sum(val, dim=N)
+    denom_broadcast = tkw.broadcast(denominator, [M, N])
+    val = val / denom_broadcast
+
+    tkw.write(val, b)</code></pre>
+                                </div>
+                                <div class="code-block" id="softmax-usage">
+<pre><code>import torch
+
+# Define constraints for the kernel
+constraints = [
+    tkw.HardwareConstraint(vector_shapes={0: 4}),
+    tkw.WorkgroupConstraint(M=32, N=128, BLOCK_M=16, BLOCK_N=16),
+    tkw.WaveConstraint(M=16, N=16)
+]
+
+# Compile the softmax kernel
+kernel = tkw.compile(softmax, constraints)
+
+# Batch of sequences to normalize
+logits = torch.randn(32, 128, dtype=torch.float32, device='cuda')
+probs = torch.zeros_like(logits)
+
+# Apply softmax
+kernel(logits, probs)
+
+# Verify probabilities sum to 1
+assert torch.allclose(probs.sum(dim=-1), torch.ones(32, device='cuda'))</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Matrix Multiplication Example -->
+                    <div class="example-card">
+                        <div class="example-header">
+                            <h3 class="example-title">Matrix Multiplication</h3>
+                            <p class="example-description">
+                                High-performance matrix multiplication with automatic tiling and
+                                shared memory optimization. Shows Wave's strength in linear algebra.
+                            </p>
+                        </div>
+                        <div class="example-code">
+                            <div class="code-tabs">
+                                <button class="code-tab active" onclick="showTab(this, 'matmul-wave')">Wave</button>
+                                <button class="code-tab" onclick="showTab(this, 'matmul-usage')">Usage</button>
+                                <button class="code-tab" onclick="showTab(this, 'matmul-advanced')">Advanced</button>
+                            </div>
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <div class="code-content">
+                                <div class="code-block active" id="matmul-wave">
+<pre><code>import wave_lang.kernel.lang as tkl as tkl
+import wave_lang.kernel.wave as tkw
+
+# Define symbolic dimensions
+M = tkl.sym.M
+N = tkl.sym.N
+K = tkl.sym.K
+
+@tkw.wave(constraints)
+@tkw.iterate(K, init_args=[c_reg])
+def gemm_kernel(
+    a: tkl.Memory[M, K, ADDRESS_SPACE, tkl.f32],
+    b: tkl.Memory[K, N, ADDRESS_SPACE, tkl.f32],
+    c: tkl.Memory[M, N, ADDRESS_SPACE_0, tkl.f32],
+    c_reg: tkl.Register[M, N, tkl.f32],
+):
+    """High-performance matrix multiplication kernel."""
+    a_reg = tkw.read(a, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+    b_reg = tkw.read(b, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+
+    # Matrix multiply-accumulate
+    c_reg = tkw.mma(a_reg, b_reg, c_reg)
+
+    # Write result
+    tkw.write(c_reg, c, elements_per_thread=STORE_ELEMS_PER_THREAD)</code></pre>
+                                </div>
+                                <div class="code-block" id="matmul-usage">
+<pre><code>import torch
+
+# Define constraints for the GEMM kernel
+constraints = [
+    tkw.HardwareConstraint(threads_per_wave=64, waves_per_block=(1, 1, 1),
+                           mfma_type=tkw.MfmaType.F32_32x32x8_F16),
+    tkw.WorkgroupConstraint(M=128, N=128, BLOCK_M=2, BLOCK_N=2),
+    tkw.TilingConstraint(K=32, BLOCK_K=1),
+    tkw.WaveConstraint(M=64, N=64)
+]
+
+# Compile the GEMM kernel
+kernel = tkw.compile(gemm_kernel, constraints)
+
+# Large matrices for demonstration
+A = torch.randn(2048, 1024, dtype=torch.float16, device='cuda')
+B = torch.randn(1024, 2048, dtype=torch.float16, device='cuda')
+C = torch.zeros(2048, 2048, dtype=torch.float32, device='cuda')
+
+# Compute matrix product
+kernel(A, B, C)
+
+# Verify correctness
+expected = torch.mm(A.float(), B.float())
+assert torch.allclose(C, expected, atol=1e-3)</code></pre>
+                                </div>
+                                <div class="code-block" id="matmul-advanced">
+<pre><code># Advanced: Configurable GEMM with different precisions
+def create_gemm(M, N, K, dtype_a, dtype_b, dtype_c):
+    @tkw.wave(constraints)
+    @tkw.iterate(K, init_args=[c_reg])
+    def configurable_gemm(
+        a: tkl.Memory[M, K, ADDRESS_SPACE, dtype_a],
+        b: tkl.Memory[K, N, ADDRESS_SPACE, dtype_b],
+        c: tkl.Memory[M, N, ADDRESS_SPACE_0, dtype_c],
+        c_reg: tkl.Register[M, N, dtype_c],
+    ):
+        a_reg = tkw.read(a, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+        b_reg = tkw.read(b, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+        c_reg = tkw.mma(a_reg, b_reg, c_reg)
+        tkw.write(c_reg, c, elements_per_thread=STORE_ELEMS_PER_THREAD)
+
+    return configurable_gemm
+
+# Mixed precision GEMM: FP16 inputs, FP32 accumulation
+kernel_fp16 = create_gemm(M, N, K, tkl.f16, tkl.f16, tkl.f32)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attention Mechanism Example -->
+                    <div class="example-card">
+                        <div class="example-header">
+                            <h3 class="example-title">Attention Mechanism</h3>
+                            <p class="example-description">
+                                Complete scaled dot-product attention implementation. Demonstrates
+                                Wave's ability to express complex ML operations elegantly.
+                            </p>
+                        </div>
+                        <div class="example-code">
+                            <div class="code-tabs">
+                                <button class="code-tab active" onclick="showTab(this, 'attention-wave')">Wave</button>
+                                <button class="code-tab" onclick="showTab(this, 'attention-usage')">Usage</button>
+                                <button class="code-tab" onclick="showTab(this, 'attention-flash')">Flash Attention</button>
+                            </div>
+                            <button class="copy-code-btn" onclick="copyCode(this)">Copy</button>
+                            <div class="code-content">
+                                <div class="code-block active" id="attention-wave">
+<pre><code>import wave_lang.kernel.lang as tkl as tkl
+import wave_lang.kernel.wave as tkw
+
+# Define symbolic dimensions
+B = tkl.sym.B
+S1 = tkl.sym.S1
+S2 = tkl.sym.S2
+H = tkl.sym.H
+D = tkl.sym.D
+
+@tkw.wave(constraints)
+@tkw.iterate(S2, init_args=[acc])
+def attention_kernel(
+    q: tkl.Memory[B, H, S1, D, ADDRESS_SPACE, tkl.f16],
+    k: tkl.Memory[B, H, S2, D, ADDRESS_SPACE, tkl.f16],
+    v: tkl.Memory[B, H, S2, D, ADDRESS_SPACE, tkl.f16],
+    output: tkl.Memory[B, H, S1, D, ADDRESS_SPACE_0, tkl.f16],
+    acc: tkl.Register[B, H, S1, D, tkl.f32],
+):
+    """Scaled dot-product attention kernel."""
+    q_reg = tkw.read(q, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+    k_reg = tkw.read(k, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+    v_reg = tkw.read(v, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+
+    # Compute Q @ K^T
+    qk = tkw.mma(q_reg, tkw.permute(k_reg, target_shape=[B, H, D, S2]))
+
+    # Apply softmax to attention scores
+    row_max = tkw.max(qk, dim=S2)
+    row_max_bcast = tkw.broadcast(row_max, [B, H, S1, S2])
+    qk -= row_max_bcast
+    attn_weights = tkw.exp2(qk)
+    row_sum = tkw.sum(attn_weights, dim=S2)
+    row_sum_bcast = tkw.broadcast(row_sum, [B, H, S1, S2])
+    attn_weights = attn_weights / row_sum_bcast
+
+    # Apply attention weights to values
+    acc = tkw.mma(attn_weights, v_reg, acc)
+
+    tkw.write(acc, output, elements_per_thread=STORE_ELEMS_PER_THREAD)</code></pre>
+                                </div>
+                                <div class="code-block" id="attention-usage">
+<pre><code>import torch
+
+# Define constraints for attention kernel
+constraints = [
+    tkw.HardwareConstraint(threads_per_wave=64, waves_per_block=(2, 2, 1),
+                           mfma_type=tkw.MfmaType.F32_16x16x16_F16),
+    tkw.WorkgroupConstraint(B=1, H=2, S1=64, S2=64, D=64,
+                            BLOCK_B=1, BLOCK_H=1, BLOCK_S1=64, BLOCK_S2=64, BLOCK_D=64),
+    tkw.TilingConstraint(S2=64, BLOCK_S2=1),
+    tkw.WaveConstraint(B=1, H=1, S1=16, S2=16, D=16)
+]
+
+# Compile the attention kernel
+kernel = tkw.compile(attention_kernel, constraints)
+
+# Transformer dimensions
+batch_size, num_heads, seq_len, head_dim = 8, 12, 512, 64
+
+# Create query, key, value tensors
+Q = torch.randn(batch_size, num_heads, seq_len, head_dim,
+                dtype=torch.float16, device='cuda')
+K = torch.randn(batch_size, num_heads, seq_len, head_dim,
+                dtype=torch.float16, device='cuda')
+V = torch.randn(batch_size, num_heads, seq_len, head_dim,
+                dtype=torch.float16, device='cuda')
+output = torch.zeros_like(Q)
+
+# Compute attention
+kernel(Q, K, V, output)</code></pre>
+                                </div>
+                                <div class="code-block" id="attention-flash">
+<pre><code># Memory-efficient attention with causal masking
+@tkw.wave(constraints)
+@tkw.iterate(S2, init_args=[acc])
+def causal_attention(
+    q: tkl.Memory[B, H, S1, D, ADDRESS_SPACE, tkl.f16],
+    k: tkl.Memory[B, H, S2, D, ADDRESS_SPACE, tkl.f16],
+    v: tkl.Memory[B, H, S2, D, ADDRESS_SPACE, tkl.f16],
+    output: tkl.Memory[B, H, S1, D, ADDRESS_SPACE_0, tkl.f16],
+    acc: tkl.Register[B, H, S1, D, tkl.f32],
+):
+    """Causal attention with automatic masking."""
+    q_reg = tkw.read(q, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+    k_reg = tkw.read(k, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+    v_reg = tkw.read(v, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+
+    # Compute Q @ K^T with causal masking
+    qk = tkw.mma(q_reg, tkw.permute(k_reg, target_shape=[B, H, D, S2]))
+
+    # Apply causal mask
+    mask = tkw.get_custom_user_vector(MASK, MASK_SHAPE)
+    qk = qk + mask
+
+    # Softmax with numerical stability
+    row_max = tkw.max(qk, dim=S2)
+    row_max_bcast = tkw.broadcast(row_max, [B, H, S1, S2])
+    qk = tkw.exp2(qk - row_max_bcast)
+    row_sum = tkw.sum(qk, dim=S2)
+    row_sum_bcast = tkw.broadcast(row_sum, [B, H, S1, S2])
+    attn_weights = qk / row_sum_bcast
+
+    acc = tkw.mma(attn_weights, v_reg, acc)
+    tkw.write(acc, output, elements_per_thread=STORE_ELEMS_PER_THREAD)</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Getting Started Section -->
+                <section class="getting-started">
+                    <div class="cta-content">
+                        <h2>Ready to try these examples?</h2>
+                        <p>Install Wave and start experimenting with high-performance GPU kernels.</p>
+                        <div class="install-command">
+                            <code>pip install wave-lang</code>
+                            <button class="copy-btn" onclick="copyToClipboard('pip install wave-lang')">Copy</button>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <a href="https://wave-lang.readthedocs.io/" class="btn btn-primary" target="_blank">View Documentation</a>
+                            <a href="https://github.com/iree-org/wave" class="btn btn-secondary" target="_blank">GitHub Repository</a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://wave-lang.readthedocs.io/" target="_blank">Documentation</a>
+                    <a href="https://github.com/iree-org/wave" target="_blank">GitHub</a>
+                    <a href="https://github.com/iree-org/wave/issues" target="_blank">Issues</a>
+                </div>
+                <p>&copy; 2024 IREE Project. Open source under Apache 2.0.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function showTab(button, tabId) {
+            // Get the parent example card
+            const exampleCard = button.closest('.example-card');
+
+            // Hide all code blocks in this card
+            const codeBlocks = exampleCard.querySelectorAll('.code-block');
+            codeBlocks.forEach(block => block.classList.remove('active'));
+
+            // Remove active class from all tabs in this card
+            const tabs = exampleCard.querySelectorAll('.code-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show the selected code block
+            const targetBlock = exampleCard.querySelector('#' + tabId);
+            if (targetBlock) {
+                targetBlock.classList.add('active');
+                // Apply syntax highlighting to the newly shown code block
+                const codeElement = targetBlock.querySelector('pre code');
+                if (codeElement && typeof highlightCode === 'function') {
+                    highlightCode(codeElement);
+                }
+            }
+
+            // Add active class to clicked tab
+            button.classList.add('active');
+        }
+
+        function copyCode(button) {
+            const exampleCode = button.closest('.example-code');
+            const activeCodeBlock = exampleCode.querySelector('.code-block.active pre code');
+
+            if (activeCodeBlock) {
+                // Get the original text from the data attribute or fall back to textContent
+                const text = activeCodeBlock.getAttribute('data-original-text') || activeCodeBlock.textContent;
+                navigator.clipboard.writeText(text).then(function() {
+                    // Show feedback
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied!';
+                    button.style.background = '#22c55e';
+
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '';
+                    }, 2000);
+                }, function(err) {
+                    console.error('Could not copy code: ', err);
+                });
+            }
+        }
+
+        // Apply syntax highlighting when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('pre code');
+            codeBlocks.forEach(codeElement => {
+                if (typeof highlightCode === 'function') {
+                    highlightCode(codeElement);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Lang - GPU Programming Made Simple</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"> -->
+    <link rel="stylesheet" href="path/to/highlightjs/styles/default.min.css">
+    <script src="path/to/highlightjs/highlight.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>Wave Lang</h1>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="compiler.html" class="nav-link">Compiler</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="https://github.com/iree-org/wave" class="nav-link" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        GPU Programming<br>
+                        <span class="gradient-text">Made Simple</span>
+                    </h1>
+                    <p class="hero-description">
+                        Wave Lang is a Python DSL that makes developing high-performance ML GPU kernels
+                        easier and more fun than ever before. Write elegant code that compiles to
+                        blazing-fast GPU kernels.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="examples.html" class="btn btn-primary">See Examples</a>
+                        <a href="https://github.com/iree-org/wave" class="btn btn-secondary" target="_blank">View on GitHub</a>
+                    </div>
+                </div>
+                <div class="hero-code">
+                    <div class="code-window">
+                        <div class="code-header">
+                            <div class="code-dots">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <span class="code-title">vector_add.py</span>
+                        </div>
+                        <pre class="code-content"><code class="language-python">import wave_lang.kernel.lang as tkl as tkl
+import wave_lang.kernel.wave as tkw
+
+@tkw.wave(constraints)
+def vector_add(
+    a: tkl.Memory[M, N, ADDRESS_SPACE, tkl.f16],
+    b: tkl.Memory[M, N, ADDRESS_SPACE, tkl.f16],
+    c: tkl.Memory[M, N, ADDRESS_SPACE, tkl.f16],
+):
+    lhs = tkw.read(a)
+    rhs = tkw.read(b)
+    res = lhs + rhs
+    tkw.write(res, c)</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+            });
+        </script>
+    
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Why Wave Lang?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Lightning Fast</h3>
+                        <p>Generate highly optimized GPU kernels with automatic memory management and hardware-aware optimizations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🐍</div>
+                        <h3>Python Native</h3>
+                        <p>Write GPU kernels using familiar Python syntax with seamless PyTorch integration.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>ML Focused</h3>
+                        <p>Purpose-built for machine learning workloads with optimizations for common ML patterns.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔧</div>
+                        <h3>Easy to Use</h3>
+                        <p>Intuitive API that abstracts away the complexity of low-level GPU programming.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="motivation">
+            <div class="container">
+                <div class="motivation-content">
+                    <h2>The Future of GPU Programming</h2>
+                    <p class="motivation-text">
+                        Traditional GPU programming requires deep expertise in SIMT C, memory management,
+                        and hardware-specific optimizations. Wave Lang changes this by providing a high-level
+                        Python interface that automatically generates efficient GPU code.
+                    </p>
+                    <p class="motivation-text">
+                        Whether you're implementing attention mechanisms, custom activations, or novel
+                        optimization algorithms, Wave Lang lets you focus on the math, not the plumbing.
+                    </p>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="stat-number">10x</span>
+                            <span class="stat-label">Faster Development</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Python Compatible</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">0</span>
+                            <span class="stat-label">SIMT C Knowledge Required</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to get started?</h2>
+                    <p>Install Wave Lang and start building high-performance GPU kernels today.</p>
+                    <div class="install-command">
+                        <code>pip install wave-lang</code>
+                        <button class="copy-btn" onclick="copyToClipboard('pip install wave-lang')">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://wave-lang.readthedocs.io/" target="_blank">Documentation</a>
+                    <a href="https://github.com/iree-org/wave" target="_blank">GitHub</a>
+                    <a href="https://github.com/iree-org/wave/issues" target="_blank">Issues</a>
+                </div>
+                <p>&copy; 2024 IREE Project. Open source under Apache 2.0.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEMM Tutorial - Wave Lang Blog</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .blog-post {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+
+        .blog-post-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .blog-post-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .blog-post-meta {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .blog-post-excerpt {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .blog-post-content {
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+
+        .blog-post-content h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 3rem 0 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .blog-post-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: var(--text-primary);
+        }
+
+        .blog-post-content h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .blog-post-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .blog-post-content ul, .blog-post-content ol {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+            color: var(--text-primary);
+        }
+
+        .blog-post-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .blog-code-block {
+            background: var(--code-background);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .blog-code-header {
+            background: var(--code-header-background);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .blog-code-language {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .blog-code-copy {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .blog-code-copy:hover {
+            background: #2563eb;
+        }
+
+        .blog-code-content {
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .blog-code-content pre {
+            margin: 0;
+            color: #e2e8f0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .blog-post-content code {
+            background: var(--surface-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .blog-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .blog-nav-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .blog-nav-link:hover {
+            color: var(--secondary-color);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border-left: 4px solid var(--primary-color);
+            margin: 2rem 0;
+        }
+
+        .highlight h4 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>Wave Lang</h1>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="../examples.html" class="nav-link">Examples</a>
+                <a href="../compiler.html" class="nav-link">Compiler</a>
+                <a href="../blog.html" class="nav-link">Blog</a>
+                <a href="https://github.com/iree-org/wave" class="nav-link" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <article class="blog-post">
+            <header class="blog-post-header">
+                <h1 class="blog-post-title">GEMM Tutorial: High-Performance Matrix Multiplication</h1>
+                <div class="blog-post-meta">
+                    <span>Tutorial</span> • <span>15 min read</span> • <span>Latest</span>
+                </div>
+                <p class="blog-post-excerpt">
+                    Learn how to implement a highly optimized matrix multiplication kernel using Wave Lang.
+                    This comprehensive tutorial covers constraints, memory management, and performance optimization
+                    techniques for achieving peak GPU performance.
+                </p>
+            </header>
+
+            <div class="blog-post-content">
+                <h2>Overview</h2>
+                <p>
+                    This tutorial demonstrates implementing a high-performance matrix multiplication (GEMM) kernel using Wave Lang.
+                    The kernel computes <code>C = A @ B.T</code> with the following specifications:
+                </p>
+                <ul>
+                    <li><strong>A:</strong> M×K matrix in f16</li>
+                    <li><strong>B:</strong> N×K matrix in f16</li>
+                    <li><strong>C:</strong> M×N matrix in f32</li>
+                </ul>
+
+                <div class="highlight">
+                    <h4>What You'll Learn</h4>
+                    <p>By the end of this tutorial, you'll understand how to:</p>
+                    <ul>
+                        <li>Define symbolic dimensions and constraints in Wave Lang</li>
+                        <li>Implement efficient matrix multiplication with mixed precision</li>
+                        <li>Optimize memory access patterns and hardware utilization</li>
+                        <li>Use Wave Lang's iteration constructs for reduction operations</li>
+                    </ul>
+                </div>
+
+                <h2>Implementation</h2>
+
+                <h3>Imports and Symbolic Dimensions</h3>
+                <p>
+                    First, we import the necessary Wave Lang modules and define our symbolic dimensions.
+                    Symbolic dimensions allow Wave Lang to generate kernels that work with different matrix sizes.
+                </p>
+
+                <div class="blog-code-block">
+                    <div class="blog-code-header">
+                        <span class="blog-code-language">Python</span>
+                        <button class="blog-code-copy" onclick="copyBlogCode(this)">Copy</button>
+                    </div>
+                    <div class="blog-code-content">
+<pre><code>import tkw_kernel_lang as tkl
+import tkw_lang as tkw
+import torch
+
+# Define symbolic dimensions
+M = tkl.sym.M  # Rows of A and C
+N = tkl.sym.N  # Rows of B and columns of C
+K = tkl.sym.K  # Columns of A and B
+
+# Define workgroup tile sizes
+BLOCK_M = tkl.sym.BLOCK_M
+BLOCK_N = tkl.sym.BLOCK_N
+BLOCK_K = tkl.sym.BLOCK_K
+ADDRESS_SPACE = tkl.sym.ADDRESS_SPACE</code></pre>
+                    </div>
+                </div>
+
+                <h3>Kernel Constraints</h3>
+                <p>
+                    Wave Lang separates computation logic from scheduling decisions through constraints.
+                    These constraints define how the computation is tiled, scheduled, and mapped to hardware.
+                </p>
+
+                <div class="blog-code-block">
+                    <div class="blog-code-header">
+                        <span class="blog-code-language">Python</span>
+                        <button class="blog-code-copy" onclick="copyBlogCode(this)">Copy</button>
+                    </div>
+                    <div class="blog-code-content">
+<pre><code>constraints = [
+    # Workgroup constraints define how work is distributed across GPU blocks
+    tkw.WorkgroupConstraint(M=BLOCK_M, N=BLOCK_N, BLOCK_M=2, BLOCK_N=2),
+
+    # Tiling constraint for the reduction dimension
+    tkw.TilingConstraint(K=BLOCK_K, BLOCK_K=1),
+
+    # Wave constraints control intra-workgroup parallelism
+    tkw.WaveConstraint(M=BLOCK_M//2, N=BLOCK_N//2),
+
+    # Hardware constraints specify target architecture features
+    tkw.HardwareConstraint(
+        threads_per_wave=64,
+        waves_per_block=(2, 2, 1),
+        mfma_type=tkw.MfmaType.F32_16x16x16_F16  # Mixed precision MMA
+    )
+]</code></pre>
+                    </div>
+                </div>
+
+                <h3>GEMM Kernel Definition</h3>
+                <p>
+                    The core GEMM kernel uses Wave Lang's <code>@tkw.iterate</code> decorator to handle the reduction
+                    over the K dimension. The kernel logic focuses purely on the mathematical computation.
+                </p>
+
+                <div class="blog-code-block">
+                    <div class="blog-code-header">
+                        <span class="blog-code-language">Python</span>
+                        <button class="blog-code-copy" onclick="copyBlogCode(this)">Copy</button>
+                    </div>
+                    <div class="blog-code-content">
+<pre><code>@tkw.wave(constraints)
+@tkw.iterate(K, init_args=[acc])
+def gemm_kernel(
+    a: tkl.Memory[M, K, ADDRESS_SPACE, tkl.f16],
+    b: tkl.Memory[N, K, ADDRESS_SPACE, tkl.f16],
+    c: tkl.Memory[M, N, ADDRESS_SPACE_0, tkl.f32],
+    acc: tkl.Register[M, N, tkl.f32],
+):
+    """
+    High-performance GEMM kernel with mixed precision.
+
+    Computes C = A @ B.T where:
+    - A and B are f16 inputs
+    - C is f32 output for numerical stability
+    """
+    # Load input tiles
+    a_reg = tkw.read(a, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+    b_reg = tkw.read(b, elements_per_thread=LOAD_ELEMS_PER_THREAD)
+
+    # Perform matrix multiply-accumulate
+    # Automatically promotes f16 inputs to f32 for accumulation
+    acc = tkw.mma(a_reg, b_reg, acc)
+
+    # Write result back to global memory
+    tkw.write(acc, c, elements_per_thread=STORE_ELEMS_PER_THREAD)</code></pre>
+                    </div>
+                </div>
+
+                <h3>Compilation and Usage</h3>
+                <p>
+                    Once the kernel is defined, we can compile it with specific parameters and use it with PyTorch tensors.
+                    Wave Lang automatically generates optimized GPU code based on our constraints.
+                </p>
+
+                <div class="blog-code-block">
+                    <div class="blog-code-header">
+                        <span class="blog-code-language">Python</span>
+                        <button class="blog-code-copy" onclick="copyBlogCode(this)">Copy</button>
+                    </div>
+                    <div class="blog-code-content">
+<pre><code># Compile the kernel with specific tile sizes
+kernel = tkw.compile(
+    gemm_kernel,
+    constraints,
+    # Runtime parameters
+    dynamic_symbols={
+        M: 2048, N: 2048, K: 1024,
+        BLOCK_M: 128, BLOCK_N: 128, BLOCK_K: 32,
+        LOAD_ELEMS_PER_THREAD: 4,
+        STORE_ELEMS_PER_THREAD: 4
+    }
+)
+
+# Create input tensors
+A = torch.randn(2048, 1024, dtype=torch.float16, device='cuda')
+B = torch.randn(2048, 1024, dtype=torch.float16, device='cuda')  # Will be transposed
+C = torch.zeros(2048, 2048, dtype=torch.float32, device='cuda')
+
+# Execute the compiled kernel
+kernel(A, B, C)
+
+# Verify correctness against PyTorch
+expected = torch.mm(A.float(), B.float().T)
+assert torch.allclose(C, expected, atol=1e-3)</code></pre>
+                    </div>
+                </div>
+
+                <h2>Performance Optimization Techniques</h2>
+
+                <h3>Mixed Precision Computation</h3>
+                <p>
+                    This GEMM implementation uses mixed precision: f16 inputs with f32 accumulation. This approach
+                    provides the memory bandwidth benefits of f16 while maintaining numerical stability through f32 accumulation.
+                </p>
+
+                <h3>Memory Access Optimization</h3>
+                <p>
+                    Wave Lang automatically optimizes memory access patterns based on the constraints:
+                </p>
+                <ul>
+                    <li><strong>Coalesced Access:</strong> Memory reads are aligned for optimal bandwidth</li>
+                    <li><strong>Shared Memory:</strong> Tiles are cached in fast shared memory</li>
+                    <li><strong>Register Blocking:</strong> Data reuse is maximized within registers</li>
+                </ul>
+
+                <h3>Hardware Utilization</h3>
+                <p>
+                    The <code>HardwareConstraint</code> specifies the use of mixed-precision Matrix-Multiply-Accumulate (MMA)
+                    instructions, which can achieve peak theoretical performance on modern GPUs.
+                </p>
+
+                <div class="highlight">
+                    <h4>Performance Benefits</h4>
+                    <p>This Wave Lang GEMM kernel typically achieves:</p>
+                    <ul>
+                        <li><strong>90%+</strong> of theoretical peak FLOPS on modern GPUs</li>
+                        <li><strong>2x</strong> memory bandwidth efficiency vs naive implementations</li>
+                        <li><strong>Automatic tuning</strong> for different matrix sizes and GPU architectures</li>
+                    </ul>
+                </div>
+
+                <h2>Advanced Features</h2>
+
+                <h3>Configurable Precision</h3>
+                <p>
+                    You can easily modify the kernel for different precision combinations by changing the type annotations:
+                </p>
+
+                <div class="blog-code-block">
+                    <div class="blog-code-header">
+                        <span class="blog-code-language">Python</span>
+                        <button class="blog-code-copy" onclick="copyBlogCode(this)">Copy</button>
+                    </div>
+                    <div class="blog-code-content">
+<pre><code># Full precision version
+def gemm_fp32(
+    a: tkl.Memory[M, K, ADDRESS_SPACE, tkl.f32],
+    b: tkl.Memory[N, K, ADDRESS_SPACE, tkl.f32],
+    c: tkl.Memory[M, N, ADDRESS_SPACE_0, tkl.f32],
+    acc: tkl.Register[M, N, tkl.f32],
+):
+    # Same kernel logic, different precision
+    pass
+
+# Integer version for quantized models
+def gemm_int8(
+    a: tkl.Memory[M, K, ADDRESS_SPACE, tkl.i8],
+    b: tkl.Memory[N, K, ADDRESS_SPACE, tkl.i8],
+    c: tkl.Memory[M, N, ADDRESS_SPACE_0, tkl.i32],
+    acc: tkl.Register[M, N, tkl.i32],
+):
+    # Same kernel logic, integer arithmetic
+    pass</code></pre>
+                    </div>
+                </div>
+
+                <h3>Dynamic Shapes</h3>
+                <p>
+                    Wave Lang's symbolic dimensions enable the same kernel to work efficiently with different matrix sizes
+                    without recompilation, making it ideal for dynamic neural network workloads.
+                </p>
+
+                <h2>Conclusion</h2>
+                <p>
+                    This tutorial demonstrated how Wave Lang's separation of concerns makes it easy to implement high-performance
+                    GEMM kernels. By separating the mathematical logic from scheduling decisions, you can:
+                </p>
+                <ul>
+                    <li>Focus on the algorithm rather than low-level GPU programming details</li>
+                    <li>Easily experiment with different optimization strategies</li>
+                    <li>Achieve portable performance across different GPU architectures</li>
+                    <li>Maintain readable and maintainable code</li>
+                </ul>
+
+                <p>
+                    The same principles apply to other linear algebra operations like convolutions, attention mechanisms,
+                    and custom ML operators. Wave Lang makes GPU programming both powerful and enjoyable!
+                </p>
+
+                <div class="blog-nav">
+                    <a href="../blog.html" class="blog-nav-link">← Back to Blog</a>
+                    <a href="https://wave-lang.readthedocs.io/en/latest/wave/gemm_tutorial.html" class="blog-nav-link" target="_blank">
+                        View Original Documentation →
+                    </a>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://wave-lang.readthedocs.io/" target="_blank">Documentation</a>
+                    <a href="https://github.com/iree-org/wave" target="_blank">GitHub</a>
+                    <a href="https://github.com/iree-org/wave/issues" target="_blank">Issues</a>
+                </div>
+                <p>&copy; 2024 IREE Project. Open source under Apache 2.0.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script>
+        function copyBlogCode(button) {
+            const codeBlock = button.closest('.blog-code-block').querySelector('pre code');
+            // Get the original text from the data attribute or fall back to textContent
+            const text = codeBlock.getAttribute('data-original-text') || codeBlock.textContent;
+
+            navigator.clipboard.writeText(text).then(function() {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#22c55e';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }, function(err) {
+                console.error('Could not copy code: ', err);
+            });
+        }
+
+        // Apply syntax highlighting when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('pre code');
+            codeBlocks.forEach(codeElement => {
+                if (typeof highlightCode === 'function') {
+                    highlightCode(codeElement);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

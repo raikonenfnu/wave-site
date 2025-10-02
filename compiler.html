@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wave Lang Compiler Stack - GPU Programming Made Simple</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .compiler-hero {
+            padding: 8rem 0 4rem;
+            background: var(--hero-background);
+            text-align: center;
+        }
+
+        .pipeline-section {
+            padding: 4rem 0;
+        }
+
+        .pipeline {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .pipeline-stage {
+            background: var(--card-background);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .pipeline-stage:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .pipeline-stage::after {
+            content: '→';
+            position: absolute;
+            right: -1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .pipeline-stage:last-child::after {
+            display: none;
+        }
+
+        .stage-icon {
+            width: 4rem;
+            height: 4rem;
+            background: var(--gradient);
+            border-radius: 1rem;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stage-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .stage-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 0.875rem;
+        }
+
+        .architecture-diagram {
+            background: var(--card-background);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .diagram-layers {
+            display: grid;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .diagram-layer {
+            background: var(--surface-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .layer-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .layer-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .optimization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .optimization-card {
+            background: var(--card-background);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+        }
+
+        .optimization-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .optimization-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .optimization-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f1f5f9;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .optimization-list li:last-child {
+            border-bottom: none;
+        }
+
+        .optimization-list li::before {
+            content: '✓';
+            color: var(--primary-color);
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        .tech-stack {
+            background: var(--surface-color);
+            padding: 4rem 0;
+        }
+
+        .stack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .stack-item {
+            background: var(--card-background);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stack-logo {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .stack-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .stack-role {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .pipeline {
+                grid-template-columns: 1fr;
+            }
+
+            .pipeline-stage::after {
+                content: '↓';
+                right: 50%;
+                top: calc(100% + 0.5rem);
+                transform: translateX(50%);
+            }
+
+            .pipeline-stage:last-child::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h1>Wave Lang</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="compiler.html" class="nav-link">Compiler</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="https://github.com/iree-org/wave" class="nav-link" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="compiler-hero">
+            <div class="container">
+                <h1 class="hero-title">
+                    Wave Lang <span class="gradient-text">Compiler Stack</span>
+                </h1>
+                <p class="hero-description">
+                    Understanding the technology behind Wave Lang's high-performance GPU code generation.
+                    From Python DSL to optimized kernels.
+                </p>
+            </div>
+        </section>
+
+        <!-- Compilation Pipeline -->
+        <section class="pipeline-section">
+            <div class="container">
+                <h2 class="section-title">Compilation Pipeline</h2>
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">
+                    Wave Lang transforms your Python code through multiple optimization stages to generate efficient GPU kernels.
+                </p>
+
+                <div class="pipeline">
+                    <div class="pipeline-stage">
+                        <div class="stage-icon">🐍</div>
+                        <h3 class="stage-title">Python DSL</h3>
+                        <p class="stage-description">
+                            Write high-level tensor operations using familiar Python syntax with type hints and decorators.
+                        </p>
+                    </div>
+
+                    <div class="pipeline-stage">
+                        <div class="stage-icon">🔍</div>
+                        <h3 class="stage-title">Analysis</h3>
+                        <p class="stage-description">
+                            Parse and analyze the computation graph, inferring shapes, data flow, and optimization opportunities.
+                        </p>
+                    </div>
+
+                    <div class="pipeline-stage">
+                        <div class="stage-icon">⚙️</div>
+                        <h3 class="stage-title">IR Generation</h3>
+                        <p class="stage-description">
+                            Generate IREE's intermediate representation with hardware-agnostic optimizations applied.
+                        </p>
+                    </div>
+
+                    <div class="pipeline-stage">
+                        <div class="stage-icon">🎯</div>
+                        <h3 class="stage-title">Target Lowering</h3>
+                        <p class="stage-description">
+                            Lower to target-specific representations (SPIR-V, PTX, or ROCm) with architecture-aware optimizations.
+                        </p>
+                    </div>
+
+                    <div class="pipeline-stage">
+                        <div class="stage-icon">⚡</div>
+                        <h3 class="stage-title">GPU Kernel</h3>
+                        <p class="stage-description">
+                            Generate optimized machine code that executes efficiently on your target GPU architecture.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Overview -->
+        <section class="architecture">
+            <div class="container">
+                <h2 class="section-title">Architecture Overview</h2>
+
+                <div class="architecture-diagram">
+                    <h3 style="margin-bottom: 1rem;">Wave Lang Compiler Stack</h3>
+                    <div class="diagram-layers">
+                        <div class="diagram-layer">
+                            <div class="layer-title">Wave Lang Python DSL</div>
+                            <div class="layer-description">High-level tensor operations with Python syntax</div>
+                        </div>
+                        <div class="diagram-layer">
+                            <div class="layer-title">Kernel Logic Separation</div>
+                            <div class="layer-description">Pure computational logic separated from scheduling concerns</div>
+                        </div>
+                        <div class="diagram-layer">
+                            <div class="layer-title">Constraint-Based Scheduling</div>
+                            <div class="layer-description">Declarative constraints define tiling, memory layout, and parallelization</div>
+                        </div>
+                        <div class="diagram-layer">
+                            <div class="layer-title">IREE Compiler Infrastructure</div>
+                            <div class="layer-description">MLIR-based optimization passes and code generation</div>
+                        </div>
+                        <div class="diagram-layer">
+                            <div class="layer-title">Target Backends</div>
+                            <div class="layer-description">CUDA, ROCm, Vulkan, and CPU code generation</div>
+                        </div>
+                        <div class="diagram-layer">
+                            <div class="layer-title">Runtime System</div>
+                            <div class="layer-description">Efficient kernel execution and memory management</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Separation of Concerns -->
+        <section class="separation">
+            <div class="container">
+                <h2 class="section-title">The Wave Lang Philosophy: Separation of Concerns</h2>
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 3rem;">
+                    What makes Wave Lang truly special is how it separates kernel logic from scheduling and tiling concerns,
+                    making GPU programming both simpler and more fun.
+                </p>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3>Pure Kernel Logic</h3>
+                        <p>Write clean, mathematical expressions that focus purely on the computation you want to perform. No need to think about thread blocks, shared memory, or memory coalescing patterns.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">⚙️</div>
+                        <h3>Declarative Constraints</h3>
+                        <p>Specify how you want the computation scheduled through simple constraint objects. Control tiling, memory hierarchy, and parallelization without mixing it with your algorithm.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎨</div>
+                        <h3>Easy Experimentation</h3>
+                        <p>Try different scheduling strategies by simply changing constraint parameters. No need to rewrite your kernel logic - the same mathematical code works with any scheduling approach.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Portable Performance</h3>
+                        <p>The same kernel logic can be optimized for different hardware by adjusting constraints. Move from development to production, or AMD to NVIDIA, with just constraint changes.</p>
+                    </div>
+                </div>
+
+                <div class="architecture-diagram" style="margin-top: 3rem;">
+                    <h3 style="margin-bottom: 1rem;">Traditional vs Wave Lang Approach</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <h4 style="color: #ef4444; margin-bottom: 1rem;">❌ Traditional C</h4>
+                            <div class="diagram-layer">
+                                <div class="layer-description">
+                                    Kernel logic mixed with:<br>
+                                    • Thread indexing calculations<br>
+                                    • Shared memory management<br>
+                                    • Coalescing optimizations<br>
+                                    • Block size considerations<br>
+                                    • Hardware-specific tuning
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: #22c55e; margin-bottom: 1rem;">✅ Wave Lang</h4>
+                            <div class="diagram-layer">
+                                <div class="layer-description">
+                                    <strong>Kernel:</strong> Pure math expressions<br>
+                                    <strong>Constraints:</strong> Scheduling decisions<br>
+                                    • WorkgroupConstraint<br>
+                                    • TilingConstraint<br>
+                                    • HardwareConstraint<br>
+                                    • WaveConstraint
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem; text-align: center;">
+                    <h3 style="margin-bottom: 1.5rem;">This separation makes GPU programming:</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                        <div class="stat">
+                            <span class="stat-number">🎯</span>
+                            <span class="stat-label">More Focused</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">🚀</span>
+                            <span class="stat-label">Faster to Develop</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">🔬</span>
+                            <span class="stat-label">Easier to Debug</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-number">🎉</span>
+                            <span class="stat-label">Actually Fun!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Optimizations -->
+
+        <!-- Technology Stack -->
+        <section class="tech-stack">
+            <div class="container">
+                <h2 class="section-title">Built on Proven Technology</h2>
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">
+                    Wave Lang leverages industry-leading compiler infrastructure for maximum performance and reliability.
+                </p>
+
+                <div class="stack-grid">
+                    <div class="stack-item">
+                        <div class="stack-logo">🏗️</div>
+                        <div class="stack-name">MLIR</div>
+                        <div class="stack-role">Multi-Level IR Framework</div>
+                    </div>
+
+                    <div class="stack-item">
+                        <div class="stack-logo">👻</div>
+                        <div class="stack-name">IREE</div>
+                        <div class="stack-role">Runtime & Compiler</div>
+                    </div>
+
+                    <div class="stack-item">
+                        <div class="stack-logo">🔥</div>
+                        <div class="stack-name">PyTorch</div>
+                        <div class="stack-role">Tensor Interface</div>
+                    </div>
+
+                    <div class="stack-item">
+                        <div class="stack-logo">🎯</div>
+                        <div class="stack-name">LLVM</div>
+                        <div class="stack-role">Code Generation</div>
+                    </div>
+
+                    <div class="stack-item">
+                        <div class="stack-logo">🔧</div>
+                        <div class="stack-name">ROCm</div>
+                        <div class="stack-role">AMD GPU Support</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Deep Dive -->
+        <section class="deep-dive">
+            <div class="container">
+                <h2 class="section-title">How It Works</h2>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3>Symbolic Computation</h3>
+                        <p>Wave Lang uses symbolic variables to represent tensor dimensions, enabling compile-time optimization and automatic kernel specialization based on actual input shapes.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Graph Optimization</h3>
+                        <p>The compiler analyzes the entire computation graph to identify fusion opportunities, eliminate redundant operations, and optimize memory access patterns.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">🎪</div>
+                        <h3>Automatic Tiling</h3>
+                        <p>Wave Lang automatically determines optimal tile sizes for different operations based on hardware characteristics and memory constraints of the target GPU.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">⚖️</div>
+                        <h3>Load Balancing</h3>
+                        <p>Smart work distribution ensures all GPU compute units are utilized efficiently, minimizing idle time and maximizing throughput.</p>
+                    </div>
+                </div>
+
+                <div class="cta-content" style="margin-top: 4rem;">
+                    <h2>Want to learn more?</h2>
+                    <p>Dive deeper into Wave Lang's compiler architecture and optimization techniques.</p>
+                    <div style="margin-top: 2rem;">
+                        <a href="https://wave-lang.readthedocs.io/" class="btn btn-primary" target="_blank">Read Documentation</a>
+                        <a href="https://github.com/iree-org/wave" class="btn btn-secondary" target="_blank">View Source Code</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="https://wave-lang.readthedocs.io/" target="_blank">Documentation</a>
+                    <a href="https://github.com/iree-org/wave" target="_blank">GitHub</a>
+                    <a href="https://github.com/iree-org/wave/issues" target="_blank">Issues</a>
+                </div>
+                <p>&copy; 2024 IREE Project. Open source under Apache 2.0.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Apply syntax highlighting when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('pre code');
+            codeBlocks.forEach(codeElement => {
+                if (typeof highlightCode === 'function') {
+                    highlightCode(codeElement);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
